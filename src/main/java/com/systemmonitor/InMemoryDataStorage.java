@@ -27,4 +27,13 @@ public class InMemoryDataStorage implements DataStorage {
                 System.err.println("Error sending alert: " + e.getMessage());
             }
         }
-}
+        public void logAlert(String message) {
+            // Logic to log the alert
+            System.out.println("Alert logged: " + message);
+        }
+    
+        public void notifyAdmin(String message) {
+            // Logic to notify the admin
+            System.out.println("Admin notified: " + message);
+        }}
+    }
