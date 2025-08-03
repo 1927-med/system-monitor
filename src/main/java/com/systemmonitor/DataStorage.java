@@ -5,26 +5,27 @@ import java.util.ArrayList;
 public class DataStorage {
     // This class will handle data storage for the system monitor.
     // It can be implemented to store data in memory, a database, or any other storage solution.
+    private ArrayList<Metric> metrics = new ArrayList<>();
 
-    public void storeMetric(Metric metric) {
+    public void storeMetric( Metric metric) {
         // Logic to save data
-        ArrayList<Metric> metrics = new ArrayList<>();
+        // For example, store the metric in memory
         metrics.add(metric);
     }
 
-    public String retrieveData(Metric metric) {
+    public String retrieveData() {
         // Logic to retrieve data
         // For example, return a string representation of the metric
-        ArrayList<Metric> metrics = new ArrayList<>();
+
         return metrics.toString();
     }
 
-    public void clearData(Metric metric) { 
+    public void clearData() { 
         // Logic to clear stored data
         // For example, remove all metrics with a specific name
+        metrics.clear();
         
-        ArrayList<Metric> metrics = new ArrayList<>();
-        metrics.remove(metric);
+       
     }
     
 }

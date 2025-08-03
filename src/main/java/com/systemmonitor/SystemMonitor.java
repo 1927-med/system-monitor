@@ -7,37 +7,21 @@ public class SystemMonitor {
         // This is where the main logic of the system monitor would be implemented.
         // For example, you might want to initialize the data storage, start collecting metrics,
         // and handle alerts.
-        InMemoryDataStorage dataStorage = new InMemoryDataStorage() {
-            
-            public void saveData(String data) {
-                // Implementation for saving data
-                System.out.println("Data saved: " + data);
-            }
+        InMemoryDataStorage dataStorage = new InMemoryDataStorage();
+        Alerting alerting = new Alerting();
 
-            
-            public String retrieveData() {
-                // Implementation for retrieving data
-                return "Sample Data";
-            }
-
-            
-            public void clearData() {
-                // Implementation for clearing data
-                System.out.println("Data cleared.");
-            }
-            
-        };
+         // Initialize data storage
+         dataStorage.init();
         
-        Alerting alerting = new Alerting() {
+         // Collect metrics
+         Metric metric = new Metric("CPU Usage", 50.0, System.currentTimeMillis());
+         dataStorage.storeMetric(metric);
+         
+         // Handle alerts
+         alerting.sendAlert("CPU usage is high!");
             
-            public void sendAlert(String message) {
-                // Implementation for sending alerts
-                System.out.println("Alert sent: " + message);
-            }
         
         
-        
-        };
     }
     
 }
