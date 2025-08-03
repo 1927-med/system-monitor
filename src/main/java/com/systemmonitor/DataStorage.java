@@ -12,19 +12,19 @@ public class DataStorage {
         metrics.add(metric);
     }
 
-    public String retrieveData(String key) {
+    public String retrieveData(Metric metric) {
         // Logic to retrieve data
         // For example, return a string representation of the metric
-        for (Metric metric : metrics) {
-            if (metric.getName().equals(key)) {
-                return metric.toString();
-            }
-        }
-        return null;
+        ArrayList<Metric> metrics = new ArrayList<>();
+        return metrics.toString();
     }
 
-    public void clearData() {
+    public void clearData(Metric metric) { 
         // Logic to clear stored data
+        // For example, remove all metrics with a specific name
+        
+        ArrayList<Metric> metrics = new ArrayList<>();
+        metrics.remove(metric);
     }
     
 }
