@@ -1,5 +1,7 @@
 package main.java.com.systemmonitor;
 
+import java.util.Objects;
+
 public class Metric {
     private String name;
     private double value;
@@ -30,6 +32,21 @@ public class Metric {
                 ", value=" + value +
                 ", timestamp=" + timestamp +
                 '}';
+    }
+
+     @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Metric metric = (Metric) o;
+        return Double.compare(metric.value, value) == 0 &&
+                timestamp == metric.timestamp &&
+                Objects.equals(name, metric.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, value, timestamp);
     }
     
 }
