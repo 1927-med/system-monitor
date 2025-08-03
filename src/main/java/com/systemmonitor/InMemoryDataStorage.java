@@ -18,4 +18,13 @@ public class InMemoryDataStorage implements DataStorage {
     public void clearData() {
         metrics.clear();
     }
+    public class Alerting {
+        public void sendAlert(String message) {
+            try {
+                // Logic to send an alert
+                System.out.println("Alert sent: " + message);
+            } catch (Exception e) {
+                System.err.println("Error sending alert: " + e.getMessage());
+            }
+        }
 }
