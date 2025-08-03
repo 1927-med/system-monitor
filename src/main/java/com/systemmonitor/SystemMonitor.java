@@ -10,8 +10,7 @@ public class SystemMonitor {
         InMemoryDataStorage dataStorage = new InMemoryDataStorage();
         Alerting alerting = new Alerting();
 
-         // Initialize data storage
-         dataStorage.init();
+         
         
          // Collect metrics
          Metric metric = new Metric("CPU Usage", 50.0, System.currentTimeMillis());

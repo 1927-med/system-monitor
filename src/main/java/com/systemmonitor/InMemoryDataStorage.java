@@ -1,25 +1,21 @@
 package main.java.com.systemmonitor;
 
-public interface InMemoryDataStorage {
+import java.util.ArrayList;
 
-    /**
-     * Saves the given data to the in-memory storage.
-     *
-     * @param data The data to be saved.
-     */
-    void saveData(String data);
+public class InMemoryDataStorage implements DataStorage {
+    private ArrayList<Metric> metrics = new ArrayList<>();
+    @Override
+    public void storeMetric(Metric metric) {
+        metrics.add(metric);
+    }
 
-    /**
-     * Retrieves the data from the in-memory storage.
-     *
-     * @return The stored data.
-     */
-    String retrieveData();
+    @Override
+    public String retrieveData() {
+        return metrics.toString();
+    }
 
-    /**
-     * Clears all data from the in-memory storage.
-     */
-    void clearData();
-} InMemoryDataStorage {
-    
+    @Override
+    public void clearData() {
+        metrics.clear();
+    }
 }
