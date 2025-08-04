@@ -1,8 +1,14 @@
 package main.java.com.systemmonitor;
+import java.lang.management.MemoryMXBean;
 
 import main.java.com.systemmonitor.Metric;
 import main.java.com.systemmonitor.InMemoryDataStorage;
+
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
+
 import main.java.com.systemmonitor.Alerting;
+import java.io.File;
 
 public class MonitoringService {
     public void startMonitoring() {
@@ -63,8 +69,9 @@ public class MonitoringService {
 
     // Note: These methods are not implemented in this example
     private double getCpuUsage() {
-        // TO DO: implement this method later Bro dont forget this
-        return 0;
+        OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
+        return operatingSystemMXBean.getSystemLoadAverage();
+        
     }
 
     private double getMemoryUsage() {
