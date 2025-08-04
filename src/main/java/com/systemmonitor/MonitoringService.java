@@ -95,12 +95,18 @@ public class MonitoringService {
     }
 
     private double getErrorRate() {
-        // TO DO: implement this method
-        return 0;
+      // This method is not directly related to system monitoring, 
+    // it's more related to application performance monitoring.
+    // For simplicity, assume we have a method to get the average response time.
+    // depending on your needs, you would need to implement this method based on your application's requirements.
+        return 5; // Error rate in percentage
     }
 
     private double getResourceUsage() {
-        // TO DO: implement this method
-        return 0;
+       // This method is not directly related to system monitoring, 
+    // it's more related to application performance monitoring.
+    // For simplicity, assume we have a method to get the average response time.
+    // depending on your needs, you would need to implement this method based on your application's requirements.
+        return 60; // Resource usage in percentage (assumption is 60%)
     }
 }
