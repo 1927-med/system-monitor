@@ -71,8 +71,8 @@ public class MonitoringService {
     // Note: These methods are not implemented in this example
     private double getCpuUsage() {
         OperatingSystemMXBean operatingSystemMXBean = (OperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        return operatingSystemMXBean.getSystemLoadAverage();
-        
+        double cpuUsage = operatingSystemMXBean.getSystemLoadAverage()/ operatingSystemMXBean.getAvailableProcessors();
+        return cpuUsage * 100.0;
     }
 
     private double getMemoryUsage() {
