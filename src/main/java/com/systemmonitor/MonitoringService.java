@@ -16,6 +16,15 @@ public class MonitoringService {
         // Call the monitor methods
         monitorServerPerformance();
         monitorApplicationPerformance();
+         // Retrieve system metrics
+         double cpuUsage = getCpuUsage();
+         double memoryUsage = getMemoryUsage();
+         double diskUsage = getDiskUsage();
+ 
+         // Print system metrics
+         System.out.println("CPU usage: " + cpuUsage + "%");
+         System.out.println("Memory usage: " + memoryUsage + "%");
+         System.out.println("Disk usage: " + diskUsage + "%");
     }
 
     private void monitorServerPerformance() {
