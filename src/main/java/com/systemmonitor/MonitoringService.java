@@ -82,16 +82,16 @@ public class MonitoringService {
     }
 
     private double getDiskUsage() {
+        File file = new File("/");
+        return ((file.getTotalSpace() - file.getFreeSpace()) * 100.0) / file.getTotalSpace();
+    }
+
+    private double getResponseTime() {
         // This method is not directly related to system monitoring, 
     // it's more related to application performance monitoring.
     // For simplicity, assume we have a method to get the average response time.
     // depending on your needs, you would need to implement this method based on your application's requirements.
     return 200; // Average response time in milliseconds
-    }
-
-    private double getResponseTime() {
-        // TO DO: implement this method
-        return 0;  
     }
 
     private double getErrorRate() {
