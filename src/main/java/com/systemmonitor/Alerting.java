@@ -4,6 +4,8 @@ public class Alerting {
     public void sendAlert(String message) {
         // Logic to send an alert
         System.out.println("Alert sent: " + message);
+        logAlert(message);
+        notifyAdmin(message);
     }
 
     public void logAlert(String message) {

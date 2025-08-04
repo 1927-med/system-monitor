@@ -12,6 +12,14 @@ import main.java.com.systemmonitor.Alerting;
 import java.io.File;
 
 public class MonitoringService {
+
+    private double[] cpuUsageValues = new double[100];
+    private double[] memoryUsageValues = new double[100];
+    private double[] diskUsageValues = new double[100];
+    private double[] responseTimeValues = new double[100];
+    private double[] errorRateValues = new double[100];
+    private double[] resourceUsageValues = new double[100];
+    private int index = 0;
     public void startMonitoring() {
         // Call the monitor methods
         monitorServerPerformance();
@@ -25,6 +33,8 @@ public class MonitoringService {
          System.out.println("CPU usage: " + cpuUsage + "%");
          System.out.println("Memory usage: " + memoryUsage + "%");
          System.out.println("Disk usage: " + diskUsage + "%");
+
+
     }
 
     private void monitorServerPerformance() {
@@ -32,6 +42,27 @@ public class MonitoringService {
         double cpuUsage = getCpuUsage();
         double memoryUsage = getMemoryUsage();
         double diskUsage = getDiskUsage();
+
+        // Storing the values in an arrays
+        cpuUsageValues[index] = cpuUsage;
+        memoryUsageValues[index] = memoryUsage;
+        diskUsageValues[index] = diskUsage;
+        
+        // Increment the index
+        index = (index + 1) % cpuUsageValues.length;
+
+
+        
+
+        Graphing graphing = new Graphing();
+        graphing.createGraph("CPU Usage", cpuUsageValues);
+        graphing.createGraph("Memory Usage", memoryUsageValues);
+        graphing.createGraph("Disk Usage", diskUsageValues);
+
+        HistoricalData historicalData = new HistoricalData();
+        historicalData.storeMetric("CPU Usage", cpuUsage);
+        historicalData.storeMetric("Memory Usage", memoryUsage);
+        historicalData.storeMetric("Disk Usage", diskUsage);
 
         // create metrics for CPU usage, memory usage, and disk usage
         Metric cpuMetric = new Metric("CPU Usage", cpuUsage, System.currentTimeMillis());
@@ -75,9 +106,21 @@ public class MonitoringService {
             Alerting alerting = new Alerting();
             alerting.sendAlert("Application performance exceeded thresholds");
         }
+
+        Graphing graphing = new Graphing();
+        graphing.createGraph("Response Time", responseTimeValues);
+        graphing.createGraph("Error Rate", errorRateValues);
+        graphing.createGraph("Resource Usage", resourceUsageValues);
+
+        HistoricalData historicalData = new HistoricalData();
+        historicalData.storeMetric("Response Time", responseTime);
+        historicalData.storeMetric("Error Rate", errorRate);
+        historicalData.storeMetric("Resource Usage", resourceUsage);
     }
 
-    // Note: These methods are not implemented in this example
+    // Note for anyone reading my code: These methods are not implemented for every different case this is a trial example 
+    // that i am trying out on my computer and may have some errors and also may not work for your pc unless you change some 
+    // stuff in the code in this class and maybe others as well. 
     private double getCpuUsage() {
         OperatingSystemMXBean operatingSystemMXBean =  ManagementFactory.getOperatingSystemMXBean();
         double systemLoadAverage = operatingSystemMXBean.getSystemLoadAverage();
