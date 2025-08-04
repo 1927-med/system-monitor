@@ -89,6 +89,14 @@ public class MonitoringService {
         double errorRate = getErrorRate();
         double resourceUsage = getResourceUsage();
 
+        // Store the values in the arrays
+        responseTimeValues[index] = responseTime;
+        errorRateValues[index] = errorRate;
+        resourceUsageValues[index] = resourceUsage;
+
+        // Increment the index
+        index = (index + 1) % responseTimeValues.length;
+
         // create metrics for response time, error rates, and resource usage
         Metric responseTimeMetric = new Metric("Response Time", responseTime, System.currentTimeMillis());
         Metric errorRateMetric = new Metric("Error Rate", errorRate, System.currentTimeMillis());
