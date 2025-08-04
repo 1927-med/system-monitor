@@ -5,6 +5,9 @@ public class Notification {
     private String email;
     
     public Notification(String name, String email) {
+        if (name == null || email == null) {
+            throw new NullPointerException("Name and email cannot be null");
+        }
         this.name = name;
         this.email = email;
     }
