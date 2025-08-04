@@ -6,8 +6,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
-public class  Graphing extends Application {
-     private double[] values;
+public class Graphing extends Application {
+
+    private double[] values;
 
     public void createGraph(String title, double[] values) {
         this.values = values;
