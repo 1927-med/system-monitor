@@ -1,5 +1,6 @@
 package main.java.com.systemmonitor;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 
 import main.java.com.systemmonitor.Metric;
 import main.java.com.systemmonitor.InMemoryDataStorage;
@@ -75,8 +76,9 @@ public class MonitoringService {
     }
 
     private double getMemoryUsage() {
-        // TO DO: implement this method
-        return 0;
+        MemoryMXBean memoryMXBean = ManagementFactory.getMemoryMXBean();
+    MemoryUsage heapMemoryUsage = memoryMXBean.getHeapMemoryUsage();
+    return (heapMemoryUsage.getUsed() * 100.0) / heapMemoryUsage.getMax();
     }
 
     private double getDiskUsage() {
@@ -86,7 +88,7 @@ public class MonitoringService {
 
     private double getResponseTime() {
         // TO DO: implement this method
-        return 0;
+        return 0;  
     }
 
     private double getErrorRate() {
