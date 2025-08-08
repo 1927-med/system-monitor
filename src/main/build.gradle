@@ -24,14 +24,14 @@ dependencies {
 sourceSets {
   main {
     java {
-      srcDirs = ['src/main/java/com/systemmonitor']
+      srcDirs = ['src/main/java']
     }
   }
 }
 
 java {
-  sourceCompatibility = '23'
-  targetCompatibility = '23'
+  sourceCompatibility = '17'
+  targetCompatibility = '17'
 }
 
 test {
@@ -42,9 +42,7 @@ application {
   mainClass = 'com.systemmonitor.SystemMonitor'
 }
 
-run {
-  jvmArgs = ['--module-path', System.getProperty('java.class.path')]
-}
+
 
 jar {
   manifest {
