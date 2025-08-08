@@ -1,4 +1,4 @@
-package main.java.com.systemmonitor;
+package com.systemmonitor;
 
 import java.util.Objects;
 

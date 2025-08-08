@@ -1,4 +1,4 @@
-package main.java.com.systemmonitor;
+package com.systemmonitor;
 
 public class HistoricalData {
     public void storeMetric(String metricName, double value) {

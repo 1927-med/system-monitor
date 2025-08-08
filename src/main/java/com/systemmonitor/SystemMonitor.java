@@ -1,4 +1,4 @@
-package main.java.com.systemmonitor;
+package com.systemmonitor;
 
 public class SystemMonitor {
     public static void main(String[] args) {
