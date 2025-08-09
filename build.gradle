@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.1.0'
+}
+
+group = 'com.systemmonitor'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+javafx {
+    version = "21" 
+    modules = [ 'javafx.controls', 'javafx.graphics' ]
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+dependencies {
+    implementation 'org.slf4j:slf4j-api:2.0.12'
+    implementation 'ch.qos.logback:logback-classic:1.5.3'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
+}
+
+application {
+    mainClass = 'com.systemmonitor.SystemMonitor'
+    applicationDefaultJvmArgs = [
+        '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED'
+    ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
