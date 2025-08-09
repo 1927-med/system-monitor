@@ -13,12 +13,22 @@ public class Graphing {
     private static LineChart<Number, Number> chart;
     private static final Map<String, XYChart.Series<Number, Number>> seriesMap = new HashMap<>();
     private static int timeCounter = 0;
+    private static final int MAX_DATA_POINTS = 60;
+    private static Stage primaryStage;
 
     public static void initialize(Stage stage) {
-        NumberAxis xAxis = new NumberAxis();
+        primaryStage = stage;
+        NumberAxis xAxis = new NumberAxis("Time (seconds)", 0, MAX_DATA_POINTS, 10);
         NumberAxis yAxis = new NumberAxis();
+        yAxis.setLabel("Usage (%)");
+        
         chart = new LineChart<>(xAxis, yAxis);
-        stage.setScene(new javafx.scene.Scene(chart, 800, 600));
+        chart.setTitle("Real-Time System Monitoring");
+        chart.setAnimated(false);
+        chart.setCreateSymbols(false);
+        chart.setLegendVisible(true);
+        
+        primaryStage.setScene(new javafx.scene.Scene(chart, 1000, 600));
     }
 
     public static void updateGraph(String metricName, double value) {
@@ -30,11 +40,22 @@ public class Graphing {
                 return newSeries;
             });
             
-            series.getData().add(new XYChart.Data<>(timeCounter++, value));
+            series.getData().add(new XYChart.Data<>(timeCounter, value));
             
-            // Limit to 30 data points
-            if (series.getData().size() > 30) {
+            if (series.getData().size() > MAX_DATA_POINTS) {
                 series.getData().remove(0);
+            }
+            
+            // Update time counter only for CPU metric to sync all graphs
+            if ("CPU Usage (%)".equals(metricName)) {
+                timeCounter++;
+                
+                // Auto-scroll X axis
+                if (timeCounter > MAX_DATA_POINTS) {
+                    NumberAxis xAxis = (NumberAxis) chart.getXAxis();
+                    xAxis.setLowerBound(xAxis.getLowerBound() + 1);
+                    xAxis.setUpperBound(xAxis.getUpperBound() + 1);
+                }
             }
         });
     }
