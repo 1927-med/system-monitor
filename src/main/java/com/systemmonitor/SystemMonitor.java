@@ -1,40 +1,78 @@
 package com.systemmonitor;
 
+import java.util.List;
+
 import javafx.application.Application;
-import javafx.application.Platform;
+import javafx.geometry.Insets;
+import javafx.scene.Scene;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class SystemMonitor extends Application {
-    
+    private MonitoringService monitor;
+    private ComboBox<String> networkInterfaceComboBox;
+
     public static void main(String[] args) {
+        // Configure MacOS-specific settings
+        System.setProperty("glass.platform", "macosx");
+        System.setProperty("prism.order", "sw");
+        System.setProperty("prism.verbose", "true"); // For debugging
+        
         launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize with sample data
-        double[] cpuData = {20, 45, 30, 60};
-        double[] memoryData = {50, 65, 40, 70};
+        // Initialize monitoring service and graphing
+        monitor = new MonitoringService();
+        Stage graphStage = new Stage();
+        Graphing.initialize(graphStage);
         
-        // Setup graphs
-        Graphing.initialize(primaryStage);
-        Graphing.createGraph("CPU Usage", cpuData);
-        Graphing.createGraph("Memory Usage", memoryData);
+        // Set up network interface selection UI
+        networkInterfaceComboBox = new ComboBox<>();
+        Label interfaceLabel = new Label("Select Network Interface:");
+        updateNetworkInterfaceList();
         
-        // Start monitoring service
-        new MonitoringService().startMonitoring();
-        
-        // Ensure application exits properly
-        primaryStage.setOnCloseRequest(e -> {
-            Platform.exit();
-            System.exit(0);
+        networkInterfaceComboBox.setOnAction(event -> {
+            int selectedIndex = networkInterfaceComboBox.getSelectionModel().getSelectedIndex();
+            if (selectedIndex >= 0) {
+                monitor.setPrimaryNetworkInterface(selectedIndex);
+            }
         });
+
+        // Create UI layout
+        VBox root = new VBox(10, interfaceLabel, networkInterfaceComboBox);
+        root.setPadding(new Insets(15));
+        
+        // Configure control window
+        Scene controlScene = new Scene(root, 300, 150);
+        primaryStage.setScene(controlScene);
+        primaryStage.setTitle("Monitor Controls");
+        primaryStage.setOnCloseRequest(event -> shutdown());
+        
+        // Show both windows
+        primaryStage.show();
+        graphStage.show();
+        
+        // Start monitoring
+        monitor.startMonitoring();
     }
 
+    private void updateNetworkInterfaceList() {
+        List<String> interfaces = monitor.getNetworkInterfaceNames();
+        networkInterfaceComboBox.getItems().setAll(interfaces);
+        if (!interfaces.isEmpty()) {
+            networkInterfaceComboBox.getSelectionModel().selectFirst();
+            monitor.setPrimaryNetworkInterface(0);
+        }
+    }
 
-    @Override
-    public void stop() {
-        // Cleanup resources if needed
-        System.out.println("System Monitor application is closing.");
+    private void shutdown() {
+        if (monitor != null) {
+            // This is just a place holder i will finish this thing later 
+            System.exit(0);
+        }
     }
 }
