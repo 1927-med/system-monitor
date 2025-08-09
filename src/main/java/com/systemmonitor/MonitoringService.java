@@ -1,12 +1,14 @@
 package com.systemmonitor;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+import javafx.application.Platform;
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
 import oshi.software.os.OSFileStore;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 public class MonitoringService {
     private final SystemInfo systemInfo = new SystemInfo();
@@ -19,25 +21,23 @@ public class MonitoringService {
         prevTicks = processor.getSystemCpuLoadTicks();
         
         executor.scheduleAtFixedRate(() -> {
-            // Get real metrics
             double cpu = getCpuUsage();
             double memoryUsage = getMemoryUsage();
             double disk = getDiskUsage();
             
-            // Update UI
             Platform.runLater(() -> {
                 Graphing.updateGraph("CPU", cpu);
                 Graphing.updateGraph("Memory", memoryUsage);
                 new Alerting().checkThresholds(cpu, memoryUsage, disk);
             });
-        }, 0, 2, TimeUnit.SECONDS); // Update every 2 seconds
+        }, 0, 2, TimeUnit.SECONDS);
     }
 
     private double getCpuUsage() {
         long[] ticks = processor.getSystemCpuLoadTicks();
         double cpuLoad = processor.getSystemCpuLoadBetweenTicks(prevTicks) * 100;
         prevTicks = ticks;
-        return Math.round(cpuLoad * 10) / 10.0; // Round to 1 decimal
+        return Math.round(cpuLoad * 10) / 10.0;
     }
 
     private double getMemoryUsage() {

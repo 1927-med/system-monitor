@@ -1,35 +1,41 @@
 package com.systemmonitor;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
 public class Graphing {
-    private static Stage primaryStage;
     private static LineChart<Number, Number> chart;
-    
+    private static final Map<String, XYChart.Series<Number, Number>> seriesMap = new HashMap<>();
+    private static int timeCounter = 0;
+
     public static void initialize(Stage stage) {
-        primaryStage = stage;
         NumberAxis xAxis = new NumberAxis();
         NumberAxis yAxis = new NumberAxis();
         chart = new LineChart<>(xAxis, yAxis);
-        primaryStage.setScene(new Scene(chart, 800, 600));
+        stage.setScene(new javafx.scene.Scene(chart, 800, 600));
     }
-    
-    public static void createGraph(String title, double[] values) {
+
+    public static void updateGraph(String metricName, double value) {
         Platform.runLater(() -> {
-            XYChart.Series<Number, Number> series = new XYChart.Series<>();
-            series.setName(title);
+            XYChart.Series<Number, Number> series = seriesMap.computeIfAbsent(metricName, k -> {
+                XYChart.Series<Number, Number> newSeries = new XYChart.Series<>();
+                newSeries.setName(metricName);
+                chart.getData().add(newSeries);
+                return newSeries;
+            });
             
-            for (int i = 0; i < values.length; i++) {
-                series.getData().add(new XYChart.Data<>(i, values[i]));
+            series.getData().add(new XYChart.Data<>(timeCounter++, value));
+            
+            // Limit to 30 data points
+            if (series.getData().size() > 30) {
+                series.getData().remove(0);
             }
-            
-            chart.getData().add(series);
-            primaryStage.show();
         });
     }
 }

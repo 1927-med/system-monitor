@@ -11,36 +11,36 @@ repositories {
     mavenCentral()
 }
 
-javafx {
-    version = "21"  // Using LTS version
-    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.base' ]
-}
-
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(23) 
     }
-    modularity.inferModulePath = true
+    modularity.inferModulePath = false
+}
+
+javafx {
+    version = "23" 
+    modules = [ 'javafx.controls', 'javafx.graphics' ]
 }
 
 dependencies {
+    implementation 'com.github.oshi:oshi-core:6.4.0'
+    implementation 'net.java.dev.jna:jna:5.13.0'
+    implementation 'net.java.dev.jna:jna-platform:5.13.0'
     implementation 'org.slf4j:slf4j-api:2.0.12'
     implementation 'ch.qos.logback:logback-classic:1.5.3'
-    implementation 'com.github.oshi:oshi-core:6.4.0' // System monitoring
-    implementation 'org.openjfx:javafx-controls:21'
-    implementation 'org.openjfx:javafx-graphics:21'
+    
+   
 }
 
 application {
     mainClass = 'com.systemmonitor.SystemMonitor'
-    applicationDefaultJvmArgs = [
-        '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED'
-    ]
 }
 
 run {
     jvmArgs = [
         '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED',
-        '-Dglass.platform=macosx'  // Specific fix for MacOS
+        '-Dglass.platform=macosx',
+        
     ]
 }
