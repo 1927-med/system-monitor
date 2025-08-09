@@ -34,3 +34,10 @@ application {
         '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED'
     ]
 }
+
+run {
+    jvmArgs = [
+        '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED',
+        '-Dglass.platform=macosx'  // Specific fix for MacOS
+    ]
+}

@@ -20,8 +20,6 @@ public class Graphing {
     }
     
     public static void createGraph(String title, double[] values) {
-        if (primaryStage == null) return;
-        
         Platform.runLater(() -> {
             XYChart.Series<Number, Number> series = new XYChart.Series<>();
             series.setName(title);
@@ -31,7 +29,6 @@ public class Graphing {
             }
             
             chart.getData().add(series);
-            primaryStage.setTitle("System Monitor - " + title);
             primaryStage.show();
         });
     }
