@@ -11,6 +11,10 @@ public class SystemMonitor extends Application {
 
     @Override
     public void start(Stage primaryStage) {
+        // Initialize graphing system
+        Graphing.initialize(primaryStage);
+        
+        // Start monitoring
         MonitoringService monitoringService = new MonitoringService();
         monitoringService.startMonitoring();
     }

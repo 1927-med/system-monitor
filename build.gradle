@@ -12,20 +12,20 @@ repositories {
 }
 
 javafx {
-    version = "21" 
-    modules = [ 'javafx.controls', 'javafx.graphics' ]
+    version = "21"  // Using LTS version
+    modules = [ 'javafx.controls', 'javafx.graphics', 'javafx.base' ]
 }
 
 java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(21)
     }
+    modularity.inferModulePath = true
 }
 
 dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.12'
     implementation 'ch.qos.logback:logback-classic:1.5.3'
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
 }
 
 application {
@@ -33,8 +33,4 @@ application {
     applicationDefaultJvmArgs = [
         '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED'
     ]
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
 }
