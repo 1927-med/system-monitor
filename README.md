@@ -1,4 +1,5 @@
 # System Monitor
+![System Monitor Screenshot](./images/Screenshot 2025-08-10 at 01.34.49.png)
 
 A Java-based system monitor that tracks key system metrics and alerts users to potential problems.
 
