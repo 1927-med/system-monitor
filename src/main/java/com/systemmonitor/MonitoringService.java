@@ -11,6 +11,12 @@ import oshi.hardware.GlobalMemory;
 import oshi.hardware.NetworkIF;
 import oshi.software.os.OSFileStore;
 
+/**
+ * This class provides methods for monitoring system metrics, such as CPU usage, memory usage, disk usage, and network usage.
+ * It uses the Oshi library to access system information.
+ * It runs a scheduled task to collect these metrics every second and updates the graphs accordingly.
+ */
+
 public class MonitoringService {
     private final SystemInfo systemInfo = new SystemInfo();
     private final CentralProcessor processor = systemInfo.getHardware().getProcessor();

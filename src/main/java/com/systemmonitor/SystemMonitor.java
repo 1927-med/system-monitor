@@ -10,6 +10,19 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * This class is the main entry point for the System Monitor application.
+ * It sets up the user interface and starts the monitoring service.
+ * It allows users to select a network interface for monitoring
+ * and displays real-time system metrics in a separate window.
+ * * The application is designed to run on MacOS with specific configurations
+ * for the JavaFX platform.
+ * * The main features include:
+ * * Tracking CPU usage, memory usage, disk space usage, and network connectivity.
+ * * Alerts users to potential problems via email or desktop notifications.
+ * * Configurable thresholds and alerting mechanisms
+ */
+
 public class SystemMonitor extends Application {
     private MonitoringService monitor;
     private ComboBox<String> networkInterfaceComboBox;
@@ -22,7 +35,10 @@ public class SystemMonitor extends Application {
         
         launch(args);
     }
-
+/**
+ * This method is called when the application starts.
+ * It sets up the user interface and starts the monitoring service.
+ */
     @Override
     public void start(Stage primaryStage) {
         // Initialize monitoring service and graphing
@@ -59,7 +75,9 @@ public class SystemMonitor extends Application {
         // Start monitoring
         monitor.startMonitoring();
     }
-
+/**
+ * This method updates the list of network interfaces available for monitoring.
+ */
     private void updateNetworkInterfaceList() {
         List<String> interfaces = monitor.getNetworkInterfaceNames();
         networkInterfaceComboBox.getItems().setAll(interfaces);
@@ -68,7 +86,14 @@ public class SystemMonitor extends Application {
             monitor.setPrimaryNetworkInterface(0);
         }
     }
+/**
+ * This method is called when the application is closed.
+ * It stops the monitoring service and exits the application.
+ * although this needs work to be implemented, for now it doesnt have much functionality as users 
+ * can simply close the gui window and the program will exit
+ */
 
+ //TODO implement this and dont forget this bro 
     private void shutdown() {
         if (monitor != null) {
             // This is just a place holder i will finish this thing later 

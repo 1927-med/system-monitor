@@ -9,6 +9,13 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.stage.Stage;
 
+/**
+ * This class handles the graphing of system metrics in a separate window.
+ * It updates the graph with real-time data from the monitoring service.
+ * It uses JavaFX's LineChart to display CPU usage, memory usage, disk usage, and network usage.
+ * The application is designed to run on MacOS with specific configurations for the JavaFX platform.
+ */
+
 public class Graphing {
     private static LineChart<Number, Number> chart;
     private static final Map<String, XYChart.Series<Number, Number>> seriesMap = new HashMap<>();
