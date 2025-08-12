@@ -37,10 +37,10 @@ public class MonitoringService {
                 double disk = getDiskUsage();
                 double network = getNetworkUsage();
                 
-                Graphing.updateGraph("CPU Usage (%)", cpu);
-                Graphing.updateGraph("Memory Usage (%)", memoryUsage);
-                Graphing.updateGraph("Disk Usage (%)", disk);
-                Graphing.updateGraph("Network (KB/s)", network);
+                LineChartGraph.updateGraph("CPU Usage (%)", cpu);
+                LineChartGraph.updateGraph("Memory Usage (%)", memoryUsage);
+                LineChartGraph.updateGraph("Disk Usage (%)", disk);
+                LineChartGraph.updateGraph("Network (KB/s)", network);
                 
             } catch (Exception e) {
                 System.err.println("Monitoring error: " + e.getMessage());

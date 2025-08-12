@@ -1,3 +1,5 @@
+package com.systemmonitor;
+
 import java.util.Map;
 
 public final class AlertManager {

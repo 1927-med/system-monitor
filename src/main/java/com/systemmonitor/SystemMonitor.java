@@ -28,7 +28,7 @@ public class SystemMonitor extends Application {
         // Initialize monitoring service and graphing
         monitor = new MonitoringService();
         Stage graphStage = new Stage();
-        Graphing.initialize(graphStage);
+        LineChartGraph.initialize(graphStage);
         
         // Set up network interface selection UI
         networkInterfaceComboBox = new ComboBox<>();
