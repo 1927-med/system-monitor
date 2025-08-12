@@ -6,7 +6,13 @@ public final class AlertManager {
     private final Map<MetricType, Threshold> thresholds;
 
     public AlertManager(Map<MetricType, Threshold> thresholds) {
-        this.thresholds = thresholds;
+        // Validate all metric types are present
+        for (MetricType type : MetricType.values()) {
+            if (!thresholds.containsKey(type)) {
+                throw new IllegalArgumentException("Missing threshold for " + type);
+            }
+        }
+        this.thresholds = Map.copyOf(thresholds); // Make immutable
     }
 
     public void checkMetrics(Map<MetricType, Double> currentMetrics) {
