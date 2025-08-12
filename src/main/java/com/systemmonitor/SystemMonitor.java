@@ -1,8 +1,12 @@
 package com.systemmonitor;
 
 import java.util.List;
+import java.util.Map;
+
+import com.systemmonitor.AlertManager.MetricType;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -26,14 +30,18 @@ import javafx.stage.Stage;
 public class SystemMonitor extends Application {
     private MonitoringService monitor;
     private ComboBox<String> networkInterfaceComboBox;
+    private LineChartGraph lineChart;
+   
 
     public static void main(String[] args) {
-        // Configure MacOS-specific settings
+        configureMacOSSettings();
+        launch(args);
+    }
+
+    private static void configureMacOSSettings() {
         System.setProperty("glass.platform", "macosx");
         System.setProperty("prism.order", "sw");
-        System.setProperty("prism.verbose", "true"); // For debugging
-        
-        launch(args);
+        System.setProperty("prism.verbose", "true");
     }
 /**
  * This method is called when the application starts.
@@ -41,12 +49,34 @@ public class SystemMonitor extends Application {
  */
     @Override
     public void start(Stage primaryStage) {
-        // Initialize monitoring service and graphing
-        monitor = new MonitoringService();
+        initializeComponents(primaryStage);
+        setupUI(primaryStage);
+        startMonitoring();
+    }
+
+    private void initializeComponents(Stage primaryStage) {
+       // Initialize with ALL required thresholds
+       AlertManager alertManager = new AlertManager(Map.of(
+        AlertManager.MetricType.CPU, new Threshold(90),
+        AlertManager.MetricType.MEMORY, new Threshold(85),
+        AlertManager.MetricType.DISK, new Threshold(95),
+        AlertManager.MetricType.NETWORK, new Threshold(80) // Added network threshold
+        ));
+
         Stage graphStage = new Stage();
-        Graphing.initialize(graphStage);
+        graphStage.setTitle("System Metrics");
+        this.lineChart = new LineChartGraph(graphStage);
+        graphStage.show(); // Explicitly show the graph window
         
-        // Set up network interface selection UI
+        // Inject dependencies
+        this.monitor = new MonitoringService(
+            alertManager,
+            lineChart,
+            new ConsoleLogger()
+        );
+    }
+
+    private void setupUI(Stage primaryStage) {
         networkInterfaceComboBox = new ComboBox<>();
         Label interfaceLabel = new Label("Select Network Interface:");
         updateNetworkInterfaceList();
@@ -58,22 +88,14 @@ public class SystemMonitor extends Application {
             }
         });
 
-        // Create UI layout
         VBox root = new VBox(10, interfaceLabel, networkInterfaceComboBox);
         root.setPadding(new Insets(15));
         
-        // Configure control window
         Scene controlScene = new Scene(root, 300, 150);
         primaryStage.setScene(controlScene);
         primaryStage.setTitle("Monitor Controls");
         primaryStage.setOnCloseRequest(event -> shutdown());
-        
-        // Show both windows
         primaryStage.show();
-        graphStage.show();
-        
-        // Start monitoring
-        monitor.startMonitoring();
     }
 /**
  * This method updates the list of network interfaces available for monitoring.
@@ -86,18 +108,15 @@ public class SystemMonitor extends Application {
             monitor.setPrimaryNetworkInterface(0);
         }
     }
-/**
- * This method is called when the application is closed.
- * It stops the monitoring service and exits the application.
- * although this needs work to be implemented, for now it doesnt have much functionality as users 
- * can simply close the gui window and the program will exit
- */
 
- //TODO implement this and dont forget this bro 
+    private void startMonitoring() {
+        monitor.startMonitoring();
+    }
+
     private void shutdown() {
         if (monitor != null) {
-            // This is just a place holder i will finish this thing later 
-            System.exit(0);
+            monitor.shutdown();
         }
+        Platform.exit();
     }
 }

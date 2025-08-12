@@ -1,6 +1,7 @@
 package com.systemmonitor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -18,6 +19,9 @@ import oshi.software.os.OSFileStore;
  */
 
 public class MonitoringService {
+    private final AlertManager alertManager;
+    private final LineChartGraph graph;
+    private final ConsoleLogger logger; 
     private final SystemInfo systemInfo = new SystemInfo();
     private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
     private final GlobalMemory memory = systemInfo.getHardware().getMemory();
@@ -26,7 +30,10 @@ public class MonitoringService {
     private long[] prevTicks;
     private ScheduledExecutorService executor;
 
-    public MonitoringService() {
+    public MonitoringService(AlertManager alertManager, LineChartGraph graph, ConsoleLogger logger) {
+        this.alertManager = alertManager;
+        this.graph = graph;
+        this.logger = logger; // Add this field: private final ConsoleLogger logger;
         if (!networkInterfaces.isEmpty()) {
             this.primaryNetworkInterface = networkInterfaces.get(0);
         }
@@ -38,16 +45,18 @@ public class MonitoringService {
         
         executor.scheduleAtFixedRate(() -> {
             try {
-                double cpu = getCpuUsage();
-                double memoryUsage = getMemoryUsage();
-                double disk = getDiskUsage();
-                double network = getNetworkUsage();
+                Map<AlertManager.MetricType, Double> metrics = Map.of(
+                    AlertManager.MetricType.CPU, getCpuUsage(),
+                    AlertManager.MetricType.MEMORY, getMemoryUsage(),
+                    AlertManager.MetricType.DISK, getDiskUsage(),
+                    AlertManager.MetricType.NETWORK, getNetworkUsage()
+                );
                 
-                Graphing.updateGraph("CPU Usage (%)", cpu);
-                Graphing.updateGraph("Memory Usage (%)", memoryUsage);
-                Graphing.updateGraph("Disk Usage (%)", disk);
-                Graphing.updateGraph("Network (KB/s)", network);
+                metrics.forEach((type, value) -> {
+                    graph.update(type.name(), value);
+                });
                 
+                alertManager.checkMetrics(metrics);
             } catch (Exception e) {
                 System.err.println("Monitoring error: " + e.getMessage());
             }
@@ -82,12 +91,17 @@ public class MonitoringService {
         return (fileStore.getTotalSpace() - fileStore.getFreeSpace()) * 100.0 / fileStore.getTotalSpace();
     }
 
-    private double getNetworkUsage() throws InterruptedException {
-        if (primaryNetworkInterface != null) {
-            primaryNetworkInterface.updateAttributes();
-            long startBytes = primaryNetworkInterface.getBytesRecv();
-            TimeUnit.SECONDS.sleep(1);
-            return (primaryNetworkInterface.getBytesRecv() - startBytes) / 1024.0;
+    private double getNetworkUsage() {
+        try {
+            if (primaryNetworkInterface != null) {
+                primaryNetworkInterface.updateAttributes();
+                long startBytes = primaryNetworkInterface.getBytesRecv();
+                TimeUnit.SECONDS.sleep(1);
+                primaryNetworkInterface.updateAttributes();
+                return (primaryNetworkInterface.getBytesRecv() - startBytes) / 1024.0;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return 0;
     }
