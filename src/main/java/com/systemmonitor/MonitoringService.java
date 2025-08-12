@@ -6,8 +6,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import com.systemmonitor.AlertManager.MetricType;
-
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
 import oshi.hardware.GlobalMemory;
@@ -17,25 +15,45 @@ import oshi.software.os.OSFileStore;
 public class MonitoringService {
     private final AlertManager alertManager;
     private final LineChartGraph graph;
+    private final ConsoleLogger logger; 
     private final SystemInfo systemInfo = new SystemInfo();
+    private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
+    private final GlobalMemory memory = systemInfo.getHardware().getMemory();
+    private final List<NetworkIF> networkInterfaces = systemInfo.getHardware().getNetworkIFs();
+    private NetworkIF primaryNetworkInterface;
+    private long[] prevTicks;
+    private ScheduledExecutorService executor;
 
-    public MonitoringService(AlertManager alertManager, LineChartGraph graph) {
+    public MonitoringService(AlertManager alertManager, LineChartGraph graph, ConsoleLogger logger) {
         this.alertManager = alertManager;
         this.graph = graph;
+        this.logger = logger; // Add this field: private final ConsoleLogger logger;
+        if (!networkInterfaces.isEmpty()) {
+            this.primaryNetworkInterface = networkInterfaces.get(0);
+        }
     }
 
     public void startMonitoring() {
-        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
-            Map<MetricType, Double> metrics = Map.of(
-                MetricType.CPU, getCpuUsage(),
-                MetricType.MEMORY, getMemoryUsage()
-            );
-            
-            metrics.forEach((type, value) -> {
-                graph.update(type.name(), value);
-            });
-            
-            alertManager.checkMetrics(metrics);
+        prevTicks = processor.getSystemCpuLoadTicks();
+        executor = Executors.newSingleThreadScheduledExecutor();
+        
+        executor.scheduleAtFixedRate(() -> {
+            try {
+                Map<AlertManager.MetricType, Double> metrics = Map.of(
+                    AlertManager.MetricType.CPU, getCpuUsage(),
+                    AlertManager.MetricType.MEMORY, getMemoryUsage(),
+                    AlertManager.MetricType.DISK, getDiskUsage(),
+                    AlertManager.MetricType.NETWORK, getNetworkUsage()
+                );
+                
+                metrics.forEach((type, value) -> {
+                    graph.update(type.name(), value);
+                });
+                
+                alertManager.checkMetrics(metrics);
+            } catch (Exception e) {
+                System.err.println("Monitoring error: " + e.getMessage());
+            }
         }, 0, 1, TimeUnit.SECONDS);
     }
 
@@ -67,12 +85,17 @@ public class MonitoringService {
         return (fileStore.getTotalSpace() - fileStore.getFreeSpace()) * 100.0 / fileStore.getTotalSpace();
     }
 
-    private double getNetworkUsage() throws InterruptedException {
-        if (primaryNetworkInterface != null) {
-            primaryNetworkInterface.updateAttributes();
-            long startBytes = primaryNetworkInterface.getBytesRecv();
-            TimeUnit.SECONDS.sleep(1);
-            return (primaryNetworkInterface.getBytesRecv() - startBytes) / 1024.0;
+    private double getNetworkUsage() {
+        try {
+            if (primaryNetworkInterface != null) {
+                primaryNetworkInterface.updateAttributes();
+                long startBytes = primaryNetworkInterface.getBytesRecv();
+                TimeUnit.SECONDS.sleep(1);
+                primaryNetworkInterface.updateAttributes();
+                return (primaryNetworkInterface.getBytesRecv() - startBytes) / 1024.0;
+            }
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
         }
         return 0;
     }

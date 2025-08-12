@@ -1,8 +1,12 @@
 package com.systemmonitor;
 
 import java.util.List;
+import java.util.Map;
+
+import com.systemmonitor.AlertManager.MetricType;
 
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
@@ -13,24 +17,47 @@ import javafx.stage.Stage;
 public class SystemMonitor extends Application {
     private MonitoringService monitor;
     private ComboBox<String> networkInterfaceComboBox;
+    private LineChartGraph lineChart;
+    private AlertManager alertManager;
 
     public static void main(String[] args) {
-        // Configure MacOS-specific settings
+        configureMacOSSettings();
+        launch(args);
+    }
+
+    private static void configureMacOSSettings() {
         System.setProperty("glass.platform", "macosx");
         System.setProperty("prism.order", "sw");
-        System.setProperty("prism.verbose", "true"); // For debugging
-        
-        launch(args);
+        System.setProperty("prism.verbose", "true");
     }
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialize monitoring service and graphing
-        monitor = new MonitoringService();
+        initializeComponents(primaryStage);
+        setupUI(primaryStage);
+        startMonitoring();
+    }
+
+    private void initializeComponents(Stage primaryStage) {
+        // Initialize with default thresholds
+        this.alertManager = new AlertManager(Map.of(
+            MetricType.CPU, new Threshold(90),
+            MetricType.MEMORY, new Threshold(85),
+            MetricType.DISK, new Threshold(95)
+        ));
+
         Stage graphStage = new Stage();
-        LineChartGraph.initialize(graphStage);
+        this.lineChart = new LineChartGraph(graphStage);
         
-        // Set up network interface selection UI
+        // Inject dependencies
+        this.monitor = new MonitoringService(
+            alertManager,
+            lineChart,
+            new ConsoleLogger()
+        );
+    }
+
+    private void setupUI(Stage primaryStage) {
         networkInterfaceComboBox = new ComboBox<>();
         Label interfaceLabel = new Label("Select Network Interface:");
         updateNetworkInterfaceList();
@@ -42,22 +69,14 @@ public class SystemMonitor extends Application {
             }
         });
 
-        // Create UI layout
         VBox root = new VBox(10, interfaceLabel, networkInterfaceComboBox);
         root.setPadding(new Insets(15));
         
-        // Configure control window
         Scene controlScene = new Scene(root, 300, 150);
         primaryStage.setScene(controlScene);
         primaryStage.setTitle("Monitor Controls");
         primaryStage.setOnCloseRequest(event -> shutdown());
-        
-        // Show both windows
         primaryStage.show();
-        graphStage.show();
-        
-        // Start monitoring
-        monitor.startMonitoring();
     }
 
     private void updateNetworkInterfaceList() {
@@ -69,10 +88,14 @@ public class SystemMonitor extends Application {
         }
     }
 
+    private void startMonitoring() {
+        monitor.startMonitoring();
+    }
+
     private void shutdown() {
         if (monitor != null) {
-            // This is just a place holder i will finish this thing later 
-            System.exit(0);
+            monitor.shutdown();
         }
+        Platform.exit();
     }
 }
