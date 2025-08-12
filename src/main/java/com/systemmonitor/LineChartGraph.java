@@ -31,6 +31,8 @@ public final class LineChartGraph {
         }
     
         public void update(String metricName, double value) {
+            System.out.printf("Chart Update - %s: %.2f at %d%n", metricName, value, timeCounter);
+            // Ensure the metric name is valid
             Platform.runLater(() -> {
                 XYChart.Series<Number, Number> series = seriesMap.computeIfAbsent(metricName,
                     k -> {
@@ -46,7 +48,8 @@ public final class LineChartGraph {
                 if (series.getData().size() > MAX_DATA_POINTS) {
                     series.getData().remove(0);
                 }
-                
+                if (metricName.startsWith("CPU")) { // More flexible check
+                    timeCounter++;
                 // Auto-scroll X axis
                 if (timeCounter > MAX_DATA_POINTS) {
                     NumberAxis xAxis = (NumberAxis) chart.getXAxis();
@@ -58,6 +61,10 @@ public final class LineChartGraph {
            if ("CPU Usage (%)".equals(metricName)) {
             timeCounter++;
         }
-        });
-    }
+            
+        }
+    });
 }
+}
+    
+    
