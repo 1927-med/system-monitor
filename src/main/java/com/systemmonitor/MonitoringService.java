@@ -1,9 +1,12 @@
 package com.systemmonitor;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import com.systemmonitor.AlertManager.MetricType;
 
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -12,39 +15,27 @@ import oshi.hardware.NetworkIF;
 import oshi.software.os.OSFileStore;
 
 public class MonitoringService {
+    private final AlertManager alertManager;
+    private final LineChartGraph graph;
     private final SystemInfo systemInfo = new SystemInfo();
-    private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
-    private final GlobalMemory memory = systemInfo.getHardware().getMemory();
-    private final List<NetworkIF> networkInterfaces = systemInfo.getHardware().getNetworkIFs();
-    private NetworkIF primaryNetworkInterface;
-    private long[] prevTicks;
-    private ScheduledExecutorService executor;
 
-    public MonitoringService() {
-        if (!networkInterfaces.isEmpty()) {
-            this.primaryNetworkInterface = networkInterfaces.get(0);
-        }
+    public MonitoringService(AlertManager alertManager, LineChartGraph graph) {
+        this.alertManager = alertManager;
+        this.graph = graph;
     }
 
     public void startMonitoring() {
-        prevTicks = processor.getSystemCpuLoadTicks();
-        executor = Executors.newSingleThreadScheduledExecutor();
-        
-        executor.scheduleAtFixedRate(() -> {
-            try {
-                double cpu = getCpuUsage();
-                double memoryUsage = getMemoryUsage();
-                double disk = getDiskUsage();
-                double network = getNetworkUsage();
-                
-                LineChartGraph.updateGraph("CPU Usage (%)", cpu);
-                LineChartGraph.updateGraph("Memory Usage (%)", memoryUsage);
-                LineChartGraph.updateGraph("Disk Usage (%)", disk);
-                LineChartGraph.updateGraph("Network (KB/s)", network);
-                
-            } catch (Exception e) {
-                System.err.println("Monitoring error: " + e.getMessage());
-            }
+        Executors.newSingleThreadScheduledExecutor().scheduleAtFixedRate(() -> {
+            Map<MetricType, Double> metrics = Map.of(
+                MetricType.CPU, getCpuUsage(),
+                MetricType.MEMORY, getMemoryUsage()
+            );
+            
+            metrics.forEach((type, value) -> {
+                graph.update(type.name(), value);
+            });
+            
+            alertManager.checkMetrics(metrics);
         }, 0, 1, TimeUnit.SECONDS);
     }
 
