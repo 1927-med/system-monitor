@@ -18,7 +18,7 @@ public class SystemMonitor extends Application {
     private MonitoringService monitor;
     private ComboBox<String> networkInterfaceComboBox;
     private LineChartGraph lineChart;
-    private AlertManager alertManager;
+   
 
     public static void main(String[] args) {
         configureMacOSSettings();
@@ -39,15 +39,18 @@ public class SystemMonitor extends Application {
     }
 
     private void initializeComponents(Stage primaryStage) {
-        // Initialize with default thresholds
-        this.alertManager = new AlertManager(Map.of(
-            MetricType.CPU, new Threshold(90),
-            MetricType.MEMORY, new Threshold(85),
-            MetricType.DISK, new Threshold(95)
+       // Initialize with ALL required thresholds
+       AlertManager alertManager = new AlertManager(Map.of(
+        AlertManager.MetricType.CPU, new Threshold(90),
+        AlertManager.MetricType.MEMORY, new Threshold(85),
+        AlertManager.MetricType.DISK, new Threshold(95),
+        AlertManager.MetricType.NETWORK, new Threshold(80) // Added network threshold
         ));
 
         Stage graphStage = new Stage();
+        graphStage.setTitle("System Metrics");
         this.lineChart = new LineChartGraph(graphStage);
+        graphStage.show(); // Explicitly show the graph window
         
         // Inject dependencies
         this.monitor = new MonitoringService(
