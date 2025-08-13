@@ -14,6 +14,19 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+/**
+ * This class is the main entry point for the System Monitor application.
+ * It sets up the user interface and starts the monitoring service.
+ * It allows users to select a network interface for monitoring
+ * and displays real-time system metrics in a separate window.
+ * * The application is designed to run on MacOS with specific configurations
+ * for the JavaFX platform.
+ * * The main features include:
+ * * Tracking CPU usage, memory usage, disk space usage, and network connectivity.
+ * * Alerts users to potential problems via email or desktop notifications.
+ * * Configurable thresholds and alerting mechanisms
+ */
+
 public class SystemMonitor extends Application {
     private MonitoringService monitor;
     private ComboBox<String> networkInterfaceComboBox;
@@ -30,7 +43,10 @@ public class SystemMonitor extends Application {
         System.setProperty("prism.order", "sw");
         System.setProperty("prism.verbose", "true");
     }
-
+/**
+ * This method is called when the application starts.
+ * It sets up the user interface and starts the monitoring service.
+ */
     @Override
     public void start(Stage primaryStage) {
         initializeComponents(primaryStage);
@@ -81,7 +97,9 @@ public class SystemMonitor extends Application {
         primaryStage.setOnCloseRequest(event -> shutdown());
         primaryStage.show();
     }
-
+/**
+ * This method updates the list of network interfaces available for monitoring.
+ */
     private void updateNetworkInterfaceList() {
         List<String> interfaces = monitor.getNetworkInterfaceNames();
         networkInterfaceComboBox.getItems().setAll(interfaces);

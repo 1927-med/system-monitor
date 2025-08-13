@@ -2,7 +2,7 @@
 ![System Monitor Screenshot](./images/screenshot.png)
 
 A Java-based system monitor that tracks key system metrics and alerts users to potential problems.
-Currently I have built this system monitor to track CPU usage, memory usage, disk space usage, and network connectivity. It uses the OSHI API for gathering operating system information. 
+Currently I have built this system monitor to track CPU usage, memory usage, disk space usage, and network connectivity. It uses the OSHI Library for gathering operating system information and JAVAFX for the user interface.
 
 ## Features
 * Tracks CPU usage, memory usage, disk space usage, and network connectivity.
