@@ -17,7 +17,8 @@ public final class AlertManager {
 
     public void checkMetrics(Map<MetricType, Double> currentMetrics) {
         currentMetrics.forEach((metric, value) -> {
-            if (value > thresholds.get(metric).value()) {
+            Threshold threshold = thresholds.get(metric);
+            if (threshold != null && value > threshold.value()) {
                 sendAlert(metric + " threshold exceeded: " + value + "%");
             }
         });
@@ -30,5 +31,3 @@ public final class AlertManager {
 
     public enum MetricType { CPU, MEMORY, DISK, NETWORK }
 }
-
-
