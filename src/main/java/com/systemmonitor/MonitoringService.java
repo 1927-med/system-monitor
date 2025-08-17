@@ -81,23 +81,43 @@ public class MonitoringService {
     }
 
     private double getDiskUsage() {
-        OSFileStore fileStore = systemInfo.getOperatingSystem().getFileSystem().getFileStores().get(0);
+       /**  OSFileStore fileStore = systemInfo.getOperatingSystem().getFileSystem().getFileStores().get(0);
+        return (fileStore.getTotalSpace() - fileStore.getFreeSpace()) * 100.0 / fileStore.getTotalSpace();
+        */ //Taking out this method to improve it.
+        List<OSFileStore> fileStores = systemInfo.getOperatingSystem().getFileSystem().getFileStores();
+        if (fileStores.isEmpty()) return 0;
+        
+        // On Linux/Windows, you might want to monitor specific mounts so that you can monitor multiple partitions
+        if (PlatformUtils.isLinux() || PlatformUtils.isWindows()) {
+            // For Linux/Windows, monitor the root filesystem
+            OSFileStore rootFs = fileStores.stream()
+                .filter(fs -> fs.getMount().equals("/") || fs.getMount().matches("[A-Z]:\\\\"))
+                .findFirst()
+                .orElse(fileStores.get(0));
+            
+            return (rootFs.getTotalSpace() - rootFs.getFreeSpace()) * 100.0 / rootFs.getTotalSpace();
+        }
+        
+        // Default behavior for macOS
+        OSFileStore fileStore = fileStores.get(0);
         return (fileStore.getTotalSpace() - fileStore.getFreeSpace()) * 100.0 / fileStore.getTotalSpace();
     }
 
     private double getNetworkUsage() {
         try {
-            if (primaryNetworkInterface != null) {
-                primaryNetworkInterface.updateAttributes();
-                long startBytes = primaryNetworkInterface.getBytesRecv();
-                TimeUnit.SECONDS.sleep(1);
-                primaryNetworkInterface.updateAttributes();
-                return (primaryNetworkInterface.getBytesRecv() - startBytes) / 1024.0;
-            }
+            if (primaryNetworkInterface == null) return 0;
+        
+            primaryNetworkInterface.updateAttributes();
+            long startBytes = primaryNetworkInterface.getBytesRecv() + primaryNetworkInterface.getBytesSent();
+            TimeUnit.SECONDS.sleep(1);
+            primaryNetworkInterface.updateAttributes();
+            long endBytes = primaryNetworkInterface.getBytesRecv() + primaryNetworkInterface.getBytesSent();
+            
+            return (endBytes - startBytes) / 1024.0; // KB/s
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            return 0;
         }
-        return 0;
     }
 
     public void shutdown() {
