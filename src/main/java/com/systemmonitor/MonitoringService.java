@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 
 import oshi.SystemInfo;
 import oshi.hardware.CentralProcessor;
@@ -72,7 +73,8 @@ public class MonitoringService {
                 
                 alertManager.checkMetrics(metrics);
             } catch (Exception e) {
-                System.err.println("Monitoring error: " + e.getMessage());
+                logger.log(Level.SEVERE, "Monitoring error: " + e.getMessage());
+                notification.sendNotification("Monitoring Error", e.getMessage());
             }
         }, 0, 1, TimeUnit.SECONDS);
     }
