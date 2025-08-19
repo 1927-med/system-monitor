@@ -30,7 +30,7 @@ dependencies {
     implementation 'org.slf4j:slf4j-api:2.0.12'
     implementation 'ch.qos.logback:logback-classic:1.5.3'
     
-    
+    // For AWT notifications - this is already included in Java SE, no need to declare it
 }
 
 application {
@@ -38,6 +38,24 @@ application {
     applicationDefaultJvmArgs = [
         '--add-opens=javafx.graphics/javafx.scene=ALL-UNNAMED',
         '-Dglass.platform=macosx',
-        '-Dprism.order=sw'  
+        '-Dprism.order=sw'
     ]
+}
+
+// Create a fat jar for easier distribution
+tasks.register('fatJar', Jar) {
+    manifest {
+        attributes 'Main-Class': 'com.systemmonitor.SystemMonitor'
+    }
+    archiveBaseName = "${project.name}-all"
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    with jar
+}
+
+// Configure build for different platforms
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs += ['-Xlint:unchecked', '-Xlint:deprecation']
 }
