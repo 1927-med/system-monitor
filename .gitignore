@@ -1,3 +1,6 @@
 .gradle/
 build/
 gradle/
+create-portable-windows.sh
+/SystemMonitor_Windows
+SystemMonitor_Windows.zip
