@@ -15,7 +15,9 @@ import oshi.software.os.OSFileStore;
 public class MonitoringService {
     private final AlertManager alertManager;
     private final LineChartGraph graph;
-    private final ConsoleLogger logger; 
+    private final ConsoleLogger logger;
+    private final Notification notification;
+    private final ConfigManager config; 
     private final SystemInfo systemInfo = new SystemInfo();
     private final CentralProcessor processor = systemInfo.getHardware().getProcessor();
     private final GlobalMemory memory = systemInfo.getHardware().getMemory();
@@ -24,13 +26,31 @@ public class MonitoringService {
     private long[] prevTicks;
     private ScheduledExecutorService executor;
 
-    public MonitoringService(AlertManager alertManager, LineChartGraph graph, ConsoleLogger logger) {
-        this.alertManager = alertManager;
-        this.graph = graph;
-        this.logger = logger; // Add this field: private final ConsoleLogger logger;
-        if (!networkInterfaces.isEmpty()) {
-            this.primaryNetworkInterface = networkInterfaces.get(0);
-        }
+   // Updated constructor
+                public MonitoringService(AlertManager alertManager, 
+                LineChartGraph graph, 
+                ConsoleLogger logger,
+                Notification notification,
+                ConfigManager config) {
+                this.alertManager = alertManager;
+                this.graph = graph;
+                this.logger = logger;
+                this.notification = notification;
+                this.config = config;
+
+                // Initialize primary network interface based on config
+                String preferredInterface = config.getProperty("network.primary");
+                networkInterfaces.stream()
+                .filter(nif -> nif.getName().equals(preferredInterface))
+                .findFirst()
+                .ifPresentOrElse(
+                nif -> this.primaryNetworkInterface = nif,
+                () -> {
+                if (!networkInterfaces.isEmpty()) {
+                this.primaryNetworkInterface = networkInterfaces.get(0);
+                }
+            }
+         );
     }
 
     public void startMonitoring() {

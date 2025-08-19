@@ -40,24 +40,30 @@ public class SystemMonitor extends Application {
 
     private void initializeComponents(Stage primaryStage) {
        // Initialize with ALL required thresholds
+       ConfigManager config = new ConfigManager();
+    
        AlertManager alertManager = new AlertManager(Map.of(
-        AlertManager.MetricType.CPU, new Threshold(90),
-        AlertManager.MetricType.MEMORY, new Threshold(85),
-        AlertManager.MetricType.DISK, new Threshold(95),
-        AlertManager.MetricType.NETWORK, new Threshold(80) // Added network threshold
-        ));
-
-        Stage graphStage = new Stage();
-        graphStage.setTitle("System Metrics");
-        this.lineChart = new LineChartGraph(graphStage);
-        graphStage.show(); // Explicitly show the graph window
-        
-        // Inject dependencies
-        this.monitor = new MonitoringService(
-            alertManager,
-            lineChart,
-            new ConsoleLogger()
-        );
+           AlertManager.MetricType.CPU, 
+               new Threshold(Integer.parseInt(config.getProperty("cpu.threshold"))),
+           AlertManager.MetricType.MEMORY, 
+               new Threshold(Integer.parseInt(config.getProperty("memory.threshold"))),
+           AlertManager.MetricType.DISK, 
+               new Threshold(Integer.parseInt(config.getProperty("disk.threshold"))),
+           AlertManager.MetricType.NETWORK, 
+               new Threshold(Integer.parseInt(config.getProperty("network.threshold")))
+       ));
+   
+       Stage graphStage = new Stage();
+       graphStage.setTitle("System Metrics - " + PlatformUtils.getPlatformName());
+       this.lineChart = new LineChartGraph(graphStage);
+       
+       this.monitor = new MonitoringService(
+           alertManager,
+           lineChart,
+           new ConsoleLogger(),
+           new Notification(),
+           config
+       );
     }
 
     private void setupUI(Stage primaryStage) {
